@@ -46,18 +46,6 @@ struct at91_cf_data {
 #define AT91_IDE_SWAP_A0_A2	0x02
 };
 
- /* USB Host */
-#define AT91_MAX_USBH_PORTS	3
-struct at91_usbh_data {
-	int		vbus_pin[AT91_MAX_USBH_PORTS];	/* port power-control pin */
-	int             overcurrent_pin[AT91_MAX_USBH_PORTS];
-	u8		ports;				/* number of ports on root hub */
-	u8              overcurrent_supported;
-	u8              vbus_pin_active_low[AT91_MAX_USBH_PORTS];
-	u8              overcurrent_status[AT91_MAX_USBH_PORTS];
-	u8              overcurrent_changed[AT91_MAX_USBH_PORTS];
-};
-
  /* NAND / SmartMedia */
 struct atmel_nand_data {
 	int		enable_pin;		/* chip enable */
@@ -84,11 +72,6 @@ struct atmel_uart_data {
 	short			use_dma_rx;	/* use receive DMA? */
 	void __iomem		*regs;		/* virt. base address, if any */
 	struct serial_rs485	rs485;		/* rs485 settings */
-};
-
-/* CAN */
-struct at91_can_data {
-	void (*transceiver_switch)(int on);
 };
 
 /* FIXME: this needs a better location, but gets stuff building again */

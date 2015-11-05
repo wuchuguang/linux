@@ -422,14 +422,14 @@ int mlx4_update_qp(struct mlx4_dev *dev, u32 qpn,
 	u64 qp_mask = 0;
 	int err = 0;
 
+	if (!attr || (attr & ~MLX4_UPDATE_QP_SUPPORTED_ATTRS))
+		return -EINVAL;
+
 	mailbox = mlx4_alloc_cmd_mailbox(dev);
 	if (IS_ERR(mailbox))
 		return PTR_ERR(mailbox);
 
 	cmd = (struct mlx4_update_qp_context *)mailbox->buf;
-
-	if (!attr || (attr & ~MLX4_UPDATE_QP_SUPPORTED_ATTRS))
-		return -EINVAL;
 
 	if (attr & MLX4_UPDATE_QP_SMAC) {
 		pri_addr_path_mask |= 1ULL << MLX4_UPD_QP_PATH_MASK_MAC_INDEX;
@@ -749,7 +749,7 @@ int mlx4_init_qp_table(struct mlx4_dev *dev)
 
 	{
 		int sort[MLX4_NUM_QP_REGION];
-		int i, j, tmp;
+		int i, j;
 		int last_base = dev->caps.num_qps;
 
 		for (i = 1; i < MLX4_NUM_QP_REGION; ++i)
@@ -758,11 +758,8 @@ int mlx4_init_qp_table(struct mlx4_dev *dev)
 		for (i = MLX4_NUM_QP_REGION; i > MLX4_QP_REGION_BOTTOM; --i) {
 			for (j = MLX4_QP_REGION_BOTTOM + 2; j < i; ++j) {
 				if (dev->caps.reserved_qps_cnt[sort[j]] >
-				    dev->caps.reserved_qps_cnt[sort[j - 1]]) {
-					tmp             = sort[j];
-					sort[j]         = sort[j - 1];
-					sort[j - 1]     = tmp;
-				}
+				    dev->caps.reserved_qps_cnt[sort[j - 1]])
+					swap(sort[j], sort[j - 1]);
 			}
 		}
 
